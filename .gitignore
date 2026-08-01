@@ -7,3 +7,4 @@ tokens.json
 locket.db
 locket.db-wal
 locket.db-shm
+__pycache__/
