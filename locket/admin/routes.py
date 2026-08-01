@@ -12,33 +12,11 @@ from .. import site_settings
 from ..rotator import AccountRotator
 from ..tokens import tokens_store
 from . import bp
-from .auth import admin_required, check_credentials, is_admin_logged_in
-
-
-@bp.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "GET":
-        if is_admin_logged_in():
-            return redirect("/admin/")
-        return render_template("admin_login.html", error=None)
-
-    username = (request.form.get("username") or "").strip()
-    password = (request.form.get("password") or "").strip()
-    if not check_credentials(username, password):
-        return render_template("admin_login.html", error="Invalid username or password"), 401
-    session.clear()
-    session["admin"] = True
-    return redirect("/admin/")
-
-
-@bp.route("/logout", methods=["POST"])
-def logout():
-    session.clear()
-    return redirect("/admin/login")
+from ..public.auth import auth_required
 
 
 @bp.route("/")
-@admin_required
+@auth_required
 def dashboard():
     return render_template("admin.html")
 
@@ -47,7 +25,7 @@ def dashboard():
 
 
 @bp.route("/api/accounts", methods=["GET"])
-@admin_required
+@auth_required
 def accounts_list():
     rotator = current_app.rotator
     if rotator is None:
