@@ -11,8 +11,8 @@ from .. import proxies as proxy_pool
 from .. import site_settings
 from ..rotator import AccountRotator
 from ..tokens import tokens_store
+from ..auth_utils import auth_required
 from . import bp
-from ..public.auth import auth_required
 
 
 @bp.route("/")

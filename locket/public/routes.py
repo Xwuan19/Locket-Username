@@ -6,8 +6,8 @@ from flask import (
 )
 
 from .. import db, site_settings, unlock
+from ..auth_utils import check_site_password, is_authenticated, auth_required
 from . import bp
-from .auth import check_site_password, is_authenticated, auth_required
 
 
 def _mobileconfig_path():
