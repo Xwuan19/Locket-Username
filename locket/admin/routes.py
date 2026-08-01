@@ -51,7 +51,7 @@ def accounts_add():
         return jsonify({"success": False, "error": f"Login failed: {err}"}), 400
 
     slot_id = rotator.add(email, password)
-    current_app.queue_manager.add_worker(slot_id)
+    # current_app.queue_manager.add_worker(slot_id)  # Queue manager not initialized
     return jsonify({"success": True, "id": slot_id, "email": email})
 
 
@@ -65,7 +65,7 @@ def accounts_remove(slot_id):
         return jsonify({"success": False, "error": "not found"}), 404
     if rotator.size() <= 1:
         return jsonify({"success": False, "error": "must keep at least 1 account"}), 400
-    current_app.queue_manager.remove_worker(slot_id)
+    # current_app.queue_manager.remove_worker(slot_id)  # Queue manager not initialized
     rotator.remove(slot_id)
     return jsonify({"success": True})
 
@@ -433,13 +433,5 @@ def mobileconfig_history():
 @bp.route("/api/queue", methods=["GET"])
 @auth_required
 def queue_snapshot():
-    qm = current_app.queue_manager
-    rotator = current_app.rotator
-    snap = qm.admin_snapshot()
-    worker_emails = {}
-    for slot_id in list(qm.workers.keys()):
-        try:
-            worker_emails[slot_id] = rotator.email(slot_id) if rotator else "<no rotator>"
-        except KeyError:
-            worker_emails[slot_id] = "<removed>"
-    return jsonify({"success": True, "workers": worker_emails, **snap})
+    # Queue manager not initialized, return empty state
+    return jsonify({"success": True, "workers": {}, "pending": 0, "active": 0})
