@@ -34,7 +34,7 @@ def accounts_list():
 
 
 @bp.route("/api/accounts", methods=["POST"])
-@admin_required
+@auth_required
 def accounts_add():
     rotator = current_app.rotator
     if rotator is None:
@@ -56,7 +56,7 @@ def accounts_add():
 
 
 @bp.route("/api/accounts/<slot_id>", methods=["DELETE"])
-@admin_required
+@auth_required
 def accounts_remove(slot_id):
     rotator = current_app.rotator
     if rotator is None:
@@ -71,7 +71,7 @@ def accounts_remove(slot_id):
 
 
 @bp.route("/api/accounts/test", methods=["POST"])
-@admin_required
+@auth_required
 def accounts_test():
     body = request.get_json(silent=True) or {}
     email = (body.get("email") or "").strip()
@@ -86,13 +86,13 @@ def accounts_test():
 
 
 @bp.route("/api/tokens", methods=["GET"])
-@admin_required
+@auth_required
 def tokens_list():
     return jsonify({"success": True, "tokens": tokens_store.list()})
 
 
 @bp.route("/api/tokens", methods=["POST"])
-@admin_required
+@auth_required
 def tokens_add():
     body = request.get_json(silent=True) or {}
     payload = body.get("payload")
@@ -113,7 +113,7 @@ def tokens_add():
 
 
 @bp.route("/api/tokens/<int:index>", methods=["DELETE"])
-@admin_required
+@auth_required
 def tokens_remove(index):
     try:
         tokens_store.remove(index)
@@ -129,13 +129,13 @@ def tokens_remove(index):
 
 
 @bp.route("/api/popup", methods=["GET"])
-@admin_required
+@auth_required
 def popup_get():
     return jsonify({"success": True, "popup": site_settings.get_popup()})
 
 
 @bp.route("/api/popup", methods=["PUT"])
-@admin_required
+@auth_required
 def popup_set():
     body = request.get_json(silent=True) or {}
     saved = site_settings.set_popup(body)
@@ -143,13 +143,13 @@ def popup_set():
 
 
 @bp.route("/api/maintenance", methods=["GET"])
-@admin_required
+@auth_required
 def maintenance_get():
     return jsonify({"success": True, "maintenance": site_settings.get_maintenance()})
 
 
 @bp.route("/api/maintenance", methods=["PUT"])
-@admin_required
+@auth_required
 def maintenance_set():
     body = request.get_json(silent=True) or {}
     saved = site_settings.set_maintenance(body)
@@ -157,7 +157,7 @@ def maintenance_set():
 
 
 @bp.route("/api/theme", methods=["GET"])
-@admin_required
+@auth_required
 def theme_get():
     return jsonify({
         "success": True,
@@ -167,7 +167,7 @@ def theme_get():
 
 
 @bp.route("/api/theme", methods=["PUT"])
-@admin_required
+@auth_required
 def theme_set():
     body = request.get_json(silent=True) or {}
     try:
@@ -178,7 +178,7 @@ def theme_set():
 
 
 @bp.route("/api/layout", methods=["GET"])
-@admin_required
+@auth_required
 def layout_get():
     return jsonify({
         "success": True,
@@ -188,7 +188,7 @@ def layout_get():
 
 
 @bp.route("/api/layout", methods=["PUT"])
-@admin_required
+@auth_required
 def layout_set():
     body = request.get_json(silent=True) or {}
     try:
@@ -219,7 +219,7 @@ def _redact(url):
 
 
 @bp.route("/api/proxies", methods=["GET"])
-@admin_required
+@auth_required
 def proxies_list():
     items = proxy_pool.list_all()
     for it in items:
@@ -232,7 +232,7 @@ def proxies_list():
 
 
 @bp.route("/api/proxies", methods=["POST"])
-@admin_required
+@auth_required
 def proxies_add():
     body = request.get_json(silent=True) or {}
     raw = body.get("raw") or body.get("url") or ""
@@ -244,7 +244,7 @@ def proxies_add():
 
 
 @bp.route("/api/proxies/<int:proxy_id>", methods=["PATCH"])
-@admin_required
+@auth_required
 def proxies_patch(proxy_id):
     body = request.get_json(silent=True) or {}
     if "enabled" in body:
@@ -253,14 +253,14 @@ def proxies_patch(proxy_id):
 
 
 @bp.route("/api/proxies/<int:proxy_id>", methods=["DELETE"])
-@admin_required
+@auth_required
 def proxies_remove(proxy_id):
     proxy_pool.remove(proxy_id)
     return jsonify({"success": True})
 
 
 @bp.route("/api/proxies/<int:proxy_id>/test", methods=["POST"])
-@admin_required
+@auth_required
 def proxies_test_one(proxy_id):
     rows = [r for r in proxy_pool.list_all() if r["id"] == proxy_id]
     if not rows:
@@ -285,7 +285,7 @@ def proxies_test_one(proxy_id):
 
 
 @bp.route("/api/proxies/master", methods=["PUT"])
-@admin_required
+@auth_required
 def proxies_master():
     body = request.get_json(silent=True) or {}
     proxy_pool.set_master(bool(body.get("enabled")))
@@ -341,7 +341,7 @@ def _looks_like_mobileconfig(blob):
 
 
 @bp.route("/api/mobileconfig", methods=["GET"])
-@admin_required
+@auth_required
 def mobileconfig_info():
     path = _mobileconfig_path()
     if not os.path.exists(path):
@@ -359,7 +359,7 @@ def mobileconfig_info():
 
 
 @bp.route("/api/mobileconfig", methods=["POST"])
-@admin_required
+@auth_required
 def mobileconfig_upload():
     f = request.files.get("file")
     if f is None or not f.filename:
@@ -398,7 +398,7 @@ def mobileconfig_upload():
 
 
 @bp.route("/api/mobileconfig", methods=["DELETE"])
-@admin_required
+@auth_required
 def mobileconfig_remove():
     path = _mobileconfig_path()
     existed = os.path.exists(path)
@@ -409,7 +409,7 @@ def mobileconfig_remove():
 
 
 @bp.route("/api/mobileconfig/history", methods=["GET"])
-@admin_required
+@auth_required
 def mobileconfig_history():
     rows = db.get_conn().execute(
         "SELECT id, action, filename, size, signed, created_at "
@@ -431,7 +431,7 @@ def mobileconfig_history():
 
 
 @bp.route("/api/queue", methods=["GET"])
-@admin_required
+@auth_required
 def queue_snapshot():
     qm = current_app.queue_manager
     rotator = current_app.rotator
