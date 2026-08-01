@@ -19,7 +19,7 @@ from flask import Flask
 
 from . import config, db
 from .admin import bp as admin_bp
-from .public import bp as public_bp
+from .public_routes import bp as public_bp
 from .rotator import AccountRotator
 
 
