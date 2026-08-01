@@ -63,11 +63,13 @@ _lock = threading.Lock()
 def _read(key):
     client = db.get_client()
     response = client.table("site_settings").select("value").eq("key", key).maybe_single().execute()
-    if not response.data:
+    if not response or not response.data:
         return dict(_DEFAULTS[key])
     try:
         merged = dict(_DEFAULTS[key])
-        value_data = response.data["value"]
+        value_data = response.data.get("value")
+        if not value_data:
+            return dict(_DEFAULTS[key])
         # Supabase returns JSONB as dict directly
         if isinstance(value_data, str):
             value_data = json.loads(value_data)

@@ -154,11 +154,13 @@ _MASTER_KEY = "proxy_master"
 def is_master_on():
     client = db.get_client()
     response = client.table("site_settings").select("value").eq("key", _MASTER_KEY).maybe_single().execute()
-    if not response.data:
+    if not response or not response.data:
         return False
     import json as _json
     try:
-        value = response.data["value"]
+        value = response.data.get("value")
+        if not value:
+            return False
         if isinstance(value, str):
             value = _json.loads(value)
         return bool(value.get("enabled"))
