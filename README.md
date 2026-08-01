@@ -347,3 +347,4 @@ This project is provided as-is for educational purposes. Use at your own discret
 ---
 
 Made with ❤️ by [Mai Huy Bao](https://maihuybao.dev)
+# Trigger redeploy
